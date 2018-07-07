@@ -1020,7 +1020,7 @@ class Request
             $qs = '?'.$qs;
         }
 
-        return $this->getSchemeAndHttpHost().$this->getBaseUrl().$this->getPathInfo().$qs;
+        return $this->getSchemeAndHttpHost().$this->getForwardedPrefix().$this->getBaseUrl().$this->getPathInfo().$qs;
     }
 
     /**
@@ -1921,6 +1921,15 @@ class Request
         }
 
         return false;
+    }
+
+    protected function getForwardedPrefix(){
+        $prefix = '';
+        if ($this->isFromTrustedProxy() && $this->headers->has("X_Forwarded_Prefix")){
+            $prefix = rtrim($this->headers->get("X_Forwarded_Prefix"), "/");
+        }
+
+        return $prefix;
     }
 
     private static function createRequestFromFactory(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
